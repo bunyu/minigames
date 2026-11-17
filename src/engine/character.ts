@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { Look } from '../core/profiles';
 
-export const FONT = 'system-ui, "Segoe UI", Roboto, sans-serif';
+export const FONT = 'Fredoka, ui-rounded, system-ui, "Segoe UI", Roboto, sans-serif';
 export const EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 
 export function emoji(scene: Phaser.Scene, x: number, y: number, value: string, size: number): Phaser.GameObjects.Text {

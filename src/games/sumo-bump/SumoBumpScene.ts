@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../../core/audio';
 import { placementsFromScores } from '../../core/scoring';
 import { BaseGameScene } from '../../engine/BaseGameScene';
 import { addCharacter } from '../../engine/character';
@@ -14,6 +15,8 @@ export const sumoBumpMeta: GameMeta = {
   maxPlayers: 4,
   approxSeconds: 60,
   howToPlay: 'Your fighter spins. Tap to DASH where the arrow points. Bump everyone off the ice!',
+  gesture: 'tap',
+  tips: ['💨 Tap = DASH', '💥 Bump others off', '🧊 The ice shrinks!'],
   background: '#0b2545',
 };
 
@@ -116,6 +119,7 @@ export class SumoBumpScene extends BaseGameScene {
     s.vy += Math.sin(s.angle) * power;
     s.cooldown = DASH_COOLDOWN;
     s.button.flash();
+    sfx('tap');
   }
 
   protected tick(dt: number): void {
@@ -180,12 +184,14 @@ export class SumoBumpScene extends BaseGameScene {
         b.vx += (jImpulse / b.mass) * dx;
         b.vy += (jImpulse / b.mass) * dy;
         this.cameras.main.shake(80, 0.004);
+        sfx('bounce');
       }
     }
   }
 
   private knockOut(s: Sumo): void {
     s.alive = false;
+    sfx('out');
     s.outAt = this.elapsed;
     s.button.setEnabled(false).setText('OUT');
     s.button.setCharge(1);

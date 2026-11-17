@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../../core/audio';
 import { placementsFromScores } from '../../core/scoring';
 import { BaseGameScene } from '../../engine/BaseGameScene';
 import { addCharacter } from '../../engine/character';
@@ -15,6 +16,8 @@ export const laserJumpMeta: GameMeta = {
   maxPlayers: 4,
   approxSeconds: 60,
   howToPlay: 'Laser beams sweep around the platform. Tap JUMP to hop over them – but you must land before you can jump again!',
+  gesture: 'tap',
+  tips: ['⚡ Laser coming…', '👆 Tap = JUMP', '🏆 Last one wins'],
   background: '#10002b',
 };
 
@@ -95,6 +98,7 @@ export class LaserJumpScene extends BaseGameScene {
     if (!this.playing || !j.alive || j.air > 0 || j.lock > 0) return;
     const airTime = AIR_TIME * (1 + this.players[j.seat].handicap);
     j.air = airTime;
+    sfx('tap');
     this.tweens.add({ targets: j.view, scale: 1.45, duration: (airTime * 1000) / 2, yoyo: true, ease: 'Sine.Out' });
     this.tweens.add({ targets: j.shadow, scale: 0.55, alpha: 0.2, duration: (airTime * 1000) / 2, yoyo: true });
   }
@@ -150,6 +154,7 @@ export class LaserJumpScene extends BaseGameScene {
 
   private zap(j: Jumper): void {
     j.alive = false;
+    sfx('zap');
     j.diedAt = this.elapsed;
     j.button.setEnabled(false).setText('OUT');
     j.button.setCharge(1);

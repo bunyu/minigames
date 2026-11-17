@@ -1,3 +1,4 @@
+import { sfx } from '../../core/audio';
 import { lookOf } from '../../core/profiles';
 import { Tournament } from '../../core/tournament';
 import { go } from '../nav';
@@ -22,9 +23,10 @@ export function podiumScreen(): HTMLElement {
   const t = session.tournament;
   if (!t || !t.isFinished) return screen('Oops', h('button', { class: 'btn', onclick: () => go('home') }, 'Home'));
   const stars = awardStars();
+  sfx('win');
   const profiles = seatProfiles();
   const standings = t.standings();
-  const winners = standings.filter((s) => s.rank === 1).map((s) => profiles[s.seat].name);
+  const winners = standings.filter((s) => s.rank === 1).map((s) => lookOf(profiles[s.seat]).name);
 
   const steps = standings.map((s) => {
     const p = profiles[s.seat];
@@ -32,7 +34,7 @@ export function podiumScreen(): HTMLElement {
       'div',
       { class: `podium-step rank-${s.rank}`, style: `--color:${lookOf(p).colorCss}` },
       characterEl(lookOf(p), s.rank === 1 ? 120 : 84),
-      h('b', {}, p.name),
+      h('b', {}, lookOf(p).name),
       h('div', { class: 'block' }, h('span', { class: 'medal' }, MEDALS[s.rank - 1]), h('span', {}, `${s.total} pts`)),
       h('small', {}, `${s.firsts} win${s.firsts === 1 ? '' : 's'} · +${stars[s.seat]} ⭐`),
     );

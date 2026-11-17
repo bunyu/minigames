@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../../core/audio';
 import { placementsFromScores } from '../../core/scoring';
 import { BaseGameScene } from '../../engine/BaseGameScene';
 import { addCharacter, emoji } from '../../engine/character';
@@ -15,6 +16,8 @@ export const bombTagMeta: GameMeta = {
   maxPlayers: 4,
   approxSeconds: 60,
   howToPlay: 'Got the bomb? Touch someone to pass it! When it explodes, whoever holds it is out.',
+  gesture: 'joystick',
+  tips: ['💣 Touch = pass it', '💥 BOOM = out', '🏃 Run away!'],
   background: '#2b0f54',
 };
 
@@ -111,7 +114,7 @@ export class BombTagScene extends BaseGameScene {
         if (collide(a, b, 1.1) && this.passCooldown <= 0 && (a.seat === this.holder || b.seat === this.holder)) {
           this.holder = a.seat === this.holder ? b.seat : a.seat;
           this.passCooldown = PASS_COOLDOWN;
-          this.cameras.main.flash(80, 255, 255, 255);
+          sfx('tap');
           this.toast('💣 Tag! You have it!', [this.holder], 900);
         }
       }
@@ -136,6 +139,7 @@ export class BombTagScene extends BaseGameScene {
 
   private explode(h: Runner): void {
     this.holder = -1;
+    sfx('boom');
     this.bomb.setVisible(false);
     h.alive = false;
     h.diedAt = ++this.outCount;

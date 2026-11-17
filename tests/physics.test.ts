@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { angleDiff, circleRect, collide, keepInside, reflect, sweptAcross, type Body } from '../src/engine/physics';
+import { angleDiff, circleRect, collide, keepInside, reflect, segmentDistance, sweptAcross, type Body } from '../src/engine/physics';
 
 const body = (x: number, y: number, vx = 0, vy = 0, r = 10, mass = 1): Body => ({ x, y, vx, vy, r, mass });
 
@@ -70,5 +70,13 @@ describe('angles', () => {
     expect(sweptAcross(Math.PI * 2 - 0.05, 0.05, 0)).toBe(true);
     expect(sweptAcross(0.2, 0.3, 0)).toBe(false);
     expect(sweptAcross(Math.PI - 0.1, -Math.PI + 0.1, 0)).toBe(false);
+  });
+});
+
+describe('segmentDistance', () => {
+  it('measures to the nearest point on the segment', () => {
+    expect(segmentDistance(5, 3, 0, 0, 10, 0)).toBeCloseTo(3);
+    expect(segmentDistance(-4, 3, 0, 0, 10, 0)).toBeCloseTo(5); // beyond the end
+    expect(segmentDistance(1, 1, 0, 0, 0, 0)).toBeCloseTo(Math.SQRT2); // zero-length
   });
 });

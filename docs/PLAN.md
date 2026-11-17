@@ -46,7 +46,7 @@ Home ─► Player Setup ─► Tournament Setup ─► [ Intro ► Game ► Rou
 ```
 
 1. **Home** – Play, Quick Play (random 5 games), Settings.
-2. **Player Setup** – 2, 3 or 4 players. Each picks a color, an animal avatar and a name (remembered between sessions).
+2. **Player Setup** – 2, 3 or 4 players. Each just picks an animal and a colour – no names (players show as "Red Cat", "Blue Tiger"…). Saved profiles keep their stars and unlocked items.
 3. **Tournament Setup**
    - Pick games individually (grid of game cards) or press "Random".
    - Min **3**, max **10** games. Games that don't support the current player count are greyed out.
@@ -95,7 +95,7 @@ Each game returns a **placement** for every player (ties allowed).
 
 | Slot | Free at start | Unlockable examples (price ⭐) |
 |---|---|---|
-| Avatar (animal) | 🐱 🐶 🐰 🐻 | 🦊 15 · 🐼 15 · 🐸 20 · 🐧 20 · 🦁 30 · 🐯 30 · 🦄 50 · 🐲 80 |
+| Avatar (animal) | 🐱 🐶 🐰 🐻 🐯 🐐 🐴 | 🦊 15 · 🐼 15 · 🐸 20 · 🐧 20 · 🐵 25 · 🦁 30 · 🐨 35 · 🦄 50 · 🐲 80 |
 | Hat | none | 🧢 cap 10 · 🎀 bow 10 · 🎩 top hat 20 · 👑 crown 60 · 🎓 grad cap 25 · 🌸 flower 30 · ⛑️ helmet 35 · 🍄 mushroom 40 |
 | Glasses / face | none | 🕶️ sunglasses 15 · 👓 glasses 15 · 🥽 goggles 40 |
 | Colour | 6 basic colours | pink 15 · sky 15 · lime 20 · silver 30 · gold 40 |
@@ -131,15 +131,15 @@ Control schemes (all multi-touch, inside each player's zone):
 | 7 | **Lava Floor** | Joystick + jump | Floor tiles crack and fall into lava; keep moving, jump gaps, push rivals. | Last survivor |
 | 8 | **Snowball Fight** | Joystick + throw | Run around snow forts, throw snowballs (aim = facing). 3 hits = out. | Elimination order |
 | 9 | **Laser Jump** | 1-button | Laser beams sweep around the centre, getting faster, sometimes two at once or reversing. Tap to jump. | Last survivor |
-| 10 | **Coin Grab** | 1-button | Runners circle the arena; tap to turn. Grab coins, avoid bombs that make you drop coins for others. | Coins after 45 s |
+| 10 | **Coin Grab** | 1-button | Runners circle the arena; tap to switch turning direction. Grab coins, avoid bombs that make you drop coins for others. | Coins after 45 s |
 | 11 | **Bomb Tag** | Joystick | One player has the bomb – touch someone to pass it. When it explodes the holder is out. | Elimination order |
 | 12 | **Kart Rally** | L/R | Top-down race, auto-accelerate, steer around a twisty track with oil slicks and boosts. 3 laps. | Finish order |
 | 13 | **King of the Hill** | Joystick + dash | A glowing zone moves around; stand in it alone to score. Dash to knock others out. | Points after 60 s |
-| 14 | **Fruit Slash** | Swipe | Fruit flies up in your half – swipe to slice, combo for bonus, slicing a bomb costs points. | Points after 40 s |
+| 14 | **Fruit Slash** | Swipe | Fruit flies up in your area (the same throws for everyone) – swipe to slice, 3 in one swipe = combo, a bomb costs 3. | Points after 40 s |
 | 15 | **Balloon Joust** | Joystick | Balloons on your back, a lance in front: pop others' balloons, protect yours. | Elimination order |
 | 16 | **Gem Miner** | 1-button | Spaceships rotate; hold to thrust. Collect gems, avoid asteroids, ram others to steal gems. | Gems after 60 s |
-| 17 | **Spike Climb** | L/R | Race up a tower by jumping between left and right walls, dodging spikes. Gets faster. | Height / finish order |
-| 18 | **Hoop Shot** | Flick | Flick balls into a moving hoop; distant shots score more. | Points after 45 s |
+| 17 | **Spike Climb** | 1-button | Each player climbs their own tower: tap to jump to the other wall and dodge spikes (same spikes for everyone). Gets faster. | Last climber / height |
+| 18 | **Hoop Shot** | Flick | Flick your ball into the moving hoop (a guide shows where it lands); far shots score 3. | Points after 45 s |
 | 19 | **Chair Dash** | Joystick | Music stops → run to a free chair. One fewer chair each round. | Elimination order |
 | 20 | **Showdown** | 1-button | Cowboy duel with fake-outs (yellow lights, sounds, decoys). Early shot = stunned. Best of 7. | Rounds won (also the tie-break game) |
 
@@ -218,9 +218,9 @@ The shell never knows game internals: it starts the scene with `{ players, setti
 | **M1 – Core loop** ✅ | Player setup, tournament setup (3–10 games), BaseGameScene, ZoneLayout, scoring + tie-breaks (unit-tested), round results, final podium, profiles + stars + Locker; 2 games (**Sumo Bump**, **Light Trails**) + shared joystick / button controls | A full tournament of 3 games can be played end-to-end with 2, 3 and 4 players |
 | **M2 – First 6 games** ✅ | Tank Twirl, Meteor Dodge, Laser Jump, Bomb Tag + virtual joystick, shared arena/physics helpers | Family playtest #1 |
 | **M3 – Android** | (JDK 21 installed ✅) Capacitor Android project, icons/splash, landscape lock, keep-awake, signed release APK | APK installs and plays on an Android phone/tablet |
-| **M4 – Games 7–13** | Bumper Soccer, Ping Square, Snowball Fight, Coin Grab, Kart Rally, King of the Hill, Showdown | Family playtest #2 (13 games) |
-| **M5 – Polish** | Sound effects + music, animated "how to play" demos, handicap system, settings screen, confetti/podium animations, balanced "Random" picker | Kids can run a tournament without adult help |
-| **M6 – Games 14–20** | Lava Floor, Fruit Slash, Balloon Joust, Gem Miner, Spike Climb, Hoop Shot, Chair Dash | 20 games available |
+| **M4 – Games 7–13** ✅ | Bumper Soccer, Ping Square, Snowball Fight, Coin Grab, Kart Rally, King of the Hill, Showdown | Family playtest #2 (13 games) |
+| **M5 – Polish** (in progress: sound ✅, bright theme ✅) | Sound effects + music, animated "how to play" demos, handicap system, settings screen, confetti/podium animations, balanced "Random" picker | Kids can run a tournament without adult help |
+| **M6 – Games 14–20** ✅ | Lava Floor, Fruit Slash, Balloon Joust, Gem Miner, Spike Climb, Hoop Shot, Chair Dash | 20 games available |
 | **M7 – Optional** | Translations, Play Store listing, stats history ("family hall of fame"), custom avatars via camera | – |
 
 Each game follows the same checklist: rules implemented → placement logic unit-tested (where pure) → works with 2/3/4 players → zones correct on phone + tablet → sounds → how-to-play demo → playtest.

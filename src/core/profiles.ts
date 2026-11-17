@@ -2,7 +2,8 @@ import { getItem, itemsFor, type Item } from './items';
 
 export interface Profile {
   id: string;
-  name: string;
+  /** Unused since v0.2 (players are their animal + colour); kept so old saves still load. */
+  name?: string;
   color: string; // item id
   avatar: string; // item id
   hat: string | null; // item id
@@ -15,6 +16,7 @@ export interface Profile {
 export interface Settings {
   unlockAll: boolean;
   doubleLast: boolean;
+  sound: boolean;
 }
 
 export interface SaveData {
@@ -27,7 +29,7 @@ export interface SaveData {
 const KEY = 'party-minigames.v1';
 
 function defaults(): SaveData {
-  return { version: 1, profiles: [], settings: { unlockAll: false, doubleLast: false }, lastSeats: [] };
+  return { version: 1, profiles: [], settings: { unlockAll: false, doubleLast: false, sound: true }, lastSeats: [] };
 }
 
 function load(): SaveData {
@@ -61,14 +63,13 @@ export function owns(profile: Profile, item: Item): boolean {
 }
 
 /** Create a profile with a colour and animal not used by `taken` profiles. */
-export function createProfile(name: string, taken: Profile[] = []): Profile {
+export function createProfile(taken: Profile[] = []): Profile {
   const usedColors = new Set(taken.map((p) => p.color));
   const usedAvatars = new Set(taken.map((p) => p.avatar));
   const freeColors = itemsFor('color').filter((i) => i.price === 0);
   const freeAvatars = itemsFor('avatar').filter((i) => i.price === 0);
   const profile: Profile = {
     id: `p${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
-    name: name.trim().slice(0, 12) || 'Player',
     color: (freeColors.find((c) => !usedColors.has(c.id)) ?? freeColors[0]).id,
     avatar: (freeAvatars.find((a) => !usedAvatars.has(a.id)) ?? freeAvatars[0]).id,
     hat: null,
@@ -108,6 +109,7 @@ export function equip(profile: Profile, item: Item): void {
 
 /** Resolved look of a profile, used by both the DOM shell and Phaser games. */
 export interface Look {
+  /** Display name, e.g. "Red Cat". */
   name: string;
   colorCss: string;
   color: number;
@@ -119,7 +121,7 @@ export interface Look {
 export function lookOf(p: Profile): Look {
   const colorCss = getItem(p.color).value;
   return {
-    name: p.name,
+    name: `${getItem(p.color).label} ${getItem(p.avatar).label}`,
     colorCss,
     color: parseInt(colorCss.slice(1), 16),
     avatar: getItem(p.avatar).value,

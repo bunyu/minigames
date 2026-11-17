@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../../core/audio';
 import { placementsFromScores } from '../../core/scoring';
 import { BaseGameScene } from '../../engine/BaseGameScene';
 import { addCharacter, label } from '../../engine/character';
@@ -15,6 +16,8 @@ export const meteorDodgeMeta: GameMeta = {
   maxPlayers: 4,
   approxSeconds: 60,
   howToPlay: 'Move with your joystick and dodge the meteors. They get faster and bigger! You can shove other players.',
+  gesture: 'joystick',
+  tips: ['🕹️ Move to dodge', '☄️ Hit = out!', '⚠️ shows where they come'],
   background: '#03045e',
 };
 
@@ -156,6 +159,7 @@ export class MeteorDodgeScene extends BaseGameScene {
   }
 
   private hit(p: Runner): void {
+    sfx('hit');
     this.cameras.main.shake(120, 0.006);
     if (p.shields > 0) {
       p.shields--;
@@ -165,6 +169,7 @@ export class MeteorDodgeScene extends BaseGameScene {
       return;
     }
     p.alive = false;
+    sfx('out');
     p.diedAt = this.elapsed;
     p.joy.setEnabled(false);
     this.tweens.add({ targets: p.view, scale: 0.2, alpha: 0, angle: 540, duration: 600 });

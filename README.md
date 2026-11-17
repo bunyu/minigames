@@ -5,7 +5,22 @@ Action mini games for 2–4 players on one tablet. Pick 3–10 games, play a tou
 - **Web / iPad / iPhone**: https://bunyu.github.io/minigames/ → Safari → Share → *Add to Home Screen* (runs fullscreen and offline)
 - **Android**: Capacitor app in `android/`
 
-See [docs/PLAN.md](docs/PLAN.md) for the full plan and game catalogue.
+See [docs/PLAN.md](docs/PLAN.md) for the full plan and game catalogue, and [docs/HANDOFF.md](docs/HANDOFF.md) for the current status and gotchas.
+
+## Games (20)
+
+| Game | Controls | | Game | Controls |
+|---|---|---|---|---|
+| 🤼 Sumo Bump | 1-button dash | | 🏎️ Kart Rally | ◀ ▶ steering |
+| 🏍️ Light Trails | ◀ ▶ | | 👑 King of the Hill | joystick + dash |
+| 🎯 Tank Twirl | hold to drive, release to fire | | 🤠 Showdown | 1-button (with fake-outs) |
+| ☄️ Meteor Dodge | joystick | | 🌋 Lava Floor | joystick + jump |
+| ⚡ Laser Jump | 1-button jump | | 🍉 Fruit Slash | swipe |
+| 💣 Bomb Tag | joystick | | 🎈 Balloon Joust | joystick |
+| ⚽ Bumper Soccer | joystick | | 💎 Gem Miner | hold to thrust |
+| 🏓 Ping Square | drag | | 🧗 Spike Climb | 1-button jump |
+| ❄️ Snowball Fight | joystick + throw | | 🏀 Hoop Shot | flick |
+| 💰 Coin Grab | 1-button turn | | 🪑 Chair Dash | joystick |
 
 ## Development
 

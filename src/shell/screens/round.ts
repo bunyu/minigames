@@ -21,7 +21,7 @@ export function roundScreen(): HTMLElement {
       { class: 'result-row', style: `--color:${lookOf(profiles[seat]).colorCss}` },
       h('span', { class: 'medal' }, MEDALS[last.placements[seat] - 1]),
       characterEl(lookOf(profiles[seat]), 56),
-      h('div', { class: 'grow' }, h('b', {}, profiles[seat].name), h('small', {}, session.lastStats?.[seat] ?? '')),
+      h('div', { class: 'grow' }, h('b', {}, lookOf(profiles[seat]).name), h('small', {}, session.lastStats?.[seat] ?? '')),
       h('span', { class: 'plus' }, `+${last.points[seat]}`),
       h('span', { class: 'total' }, `${totals[seat]} pts`),
     ),

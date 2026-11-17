@@ -1,7 +1,8 @@
-import { deleteProfile, save, store } from '../../core/profiles';
+import { sfx } from '../../core/audio';
+import { deleteProfile, lookOf, save, store } from '../../core/profiles';
 import { go } from '../nav';
 import { session } from '../state';
-import { h, screen } from '../ui';
+import { characterEl, h, screen } from '../ui';
 
 export function settingsScreen(): HTMLElement {
   const rerender = () => go('settings');
@@ -23,6 +24,20 @@ export function settingsScreen(): HTMLElement {
         }),
         ' Everything unlocked (parents)',
       ),
+      h(
+        'label',
+        { class: 'check' },
+        h('input', {
+          type: 'checkbox',
+          checked: store.settings.sound,
+          onchange: (e: Event) => {
+            store.settings.sound = (e.target as HTMLInputElement).checked;
+            save();
+            sfx('coin');
+          },
+        }),
+        ' Sound effects',
+      ),
     ),
     h(
       'div',
@@ -32,13 +47,14 @@ export function settingsScreen(): HTMLElement {
         h(
           'div',
           { class: 'row' },
-          h('span', { class: 'grow' }, `${p.name} · ⭐ ${p.stars}`),
+          characterEl(lookOf(p), 44),
+          h('span', { class: 'grow' }, `${lookOf(p).name} · ⭐ ${p.stars}`),
           h(
             'button',
             {
               class: 'btn small',
               onclick: () => {
-                if (!window.confirm(`Delete ${p.name} and all their stars?`)) return;
+                if (!window.confirm(`Delete ${lookOf(p).name} and all their stars?`)) return;
                 deleteProfile(p.id);
                 session.seats = session.seats.filter((s) => s.profileId !== p.id);
                 rerender();

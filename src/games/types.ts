@@ -1,5 +1,6 @@
 import type Phaser from 'phaser';
 import type { Look } from '../core/profiles';
+import type { Gesture } from '../engine/demo';
 import type { Placements } from '../core/scoring';
 
 export type Controls = '1-button' | 'L/R' | 'joystick' | 'drag' | 'swipe';
@@ -13,6 +14,10 @@ export interface GameMeta {
   maxPlayers: 4;
   approxSeconds: number;
   howToPlay: string;
+  /** Gesture animated on the intro screen. */
+  gesture: Gesture;
+  /** 2–3 very short picture tips for kids who don't read yet, e.g. '💣 = out'. */
+  tips: string[];
   /** Background colour of the scene. */
   background: string;
 }

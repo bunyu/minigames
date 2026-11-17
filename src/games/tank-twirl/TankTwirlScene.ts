@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../../core/audio';
 import { placementsFromScores } from '../../core/scoring';
 import { BaseGameScene } from '../../engine/BaseGameScene';
 import { addCharacter, label } from '../../engine/character';
@@ -15,6 +16,8 @@ export const tankTwirlMeta: GameMeta = {
   maxPlayers: 4,
   approxSeconds: 60,
   howToPlay: 'Your tank spins. HOLD to drive forward, LET GO to fire. Shells bounce off walls! 3 hits and you are out.',
+  gesture: 'hold',
+  tips: ['✋ Hold = drive', '👆 Let go = FIRE', '❤️❤️❤️ 3 hits = out'],
   background: '#1b2a12',
 };
 
@@ -116,6 +119,7 @@ export class TankTwirlScene extends BaseGameScene {
   private fire(t: Tank): void {
     if (!this.playing || !t.alive || t.cooldown > 0) return;
     t.cooldown = FIRE_COOLDOWN;
+    sfx('shoot');
     const speed = this.unit * 0.75;
     const tip = t.r * 1.7;
     const x = t.x + Math.cos(t.angle) * tip;
@@ -226,6 +230,7 @@ export class TankTwirlScene extends BaseGameScene {
 
   private damage(t: Tank, s: Shell): void {
     t.hp--;
+    sfx('hit');
     t.hearts.setText(t.hp > 0 ? '❤️'.repeat(t.hp) : '');
     t.x += s.vx * 0.04;
     t.y += s.vy * 0.04;
@@ -235,6 +240,7 @@ export class TankTwirlScene extends BaseGameScene {
     this.tweens.add({ targets: boom, radius: t.r * 1.6, alpha: 0, duration: 300, onComplete: () => boom.destroy() });
     if (t.hp <= 0) {
       t.alive = false;
+      sfx('boom');
       t.diedAt = this.elapsed;
       t.button.setEnabled(false).setText('OUT');
       this.tweens.add({ targets: [t.hull, t.rider], alpha: 0.25, scale: 0.8, duration: 400 });

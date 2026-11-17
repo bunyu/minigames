@@ -23,15 +23,20 @@ await page.reload();
 await shot('01-home');
 
 await page.getByText('▶ Play').click();
-await page.getByText('4 players').click();
-for (const [i, name] of ['Mia', 'Leo', 'Dad', 'Mum'].entries()) {
-  await page.locator('.seat').nth(i).locator('input.input').fill(name);
-  await page.locator('.seat').nth(i).getByText('＋').click();
-}
+await page.locator('.segmented .btn').nth(2).click(); // 4 players
+// Give two players a different animal, like kids would.
+await page.locator('.seat').nth(0).locator('.animal').nth(2).click();
+await page.locator('.seat').nth(1).locator('.animal').nth(3).click();
 await shot('02-players');
 await page.getByText('Choose games →').click();
-const gameCount = await page.locator('.game-card').count();
-for (let i = 0; i < gameCount; i++) await page.locator('.game-card').nth(i).click();
+// SMOKE_GAMES=7,8,9 plays only those cards (1-based); default: every game.
+const allCards = await page.locator('.game-card').count();
+const picks = process.env.SMOKE_GAMES
+  ? process.env.SMOKE_GAMES.split(',').map((n) => Number(n) - 1)
+  : [...Array(allCards).keys()];
+while (picks.length < 3) picks.push(picks[picks.length - 1]);
+const gameCount = picks.length;
+for (const i of picks) await page.locator('.game-card').nth(i).click();
 await shot('03-games');
 await page.getByText(new RegExp(`^Start ${gameCount} games`)).click();
 
@@ -51,8 +56,12 @@ const corners = [[100, 700], [1180, 700], [1180, 100], [100, 100]];
 const controls = [
   // Sumo Bump DASH (outer corners)
   [100, 700], [1180, 700], [1180, 100], [100, 100],
-  // Light Trails ◀ ▶
+  // Light Trails / Kart Rally ◀ ▶
   [128, 724], [512, 724], [768, 724], [1152, 724], [1152, 76], [768, 76], [512, 76], [128, 76],
+  // Action buttons stacked above joysticks (THROW / DASH)
+  [92, 544], [1188, 544], [1188, 256], [92, 256],
+  // Showdown BANG! buttons
+  [320, 688], [960, 688], [960, 112], [320, 112],
 ];
 
 for (let round = 1; round <= gameCount; round++) {
@@ -63,7 +72,14 @@ for (let round = 1; round <= gameCount; round++) {
   let took = false;
   const start = Date.now();
   while (!(await page.locator('#app').isVisible())) {
-    if (Math.random() < 0.5) {
+    const roll = Math.random();
+    if (roll < 0.15) {
+      // Everyone flicks from their ball spot toward the middle (Hoop Shot), also swipes in Fruit Slash.
+      const spots = [[320, 728], [960, 728], [960, 72], [320, 72]];
+      await touch('touchStart', spots);
+      await touch('touchMove', spots.map(([x, y]) => jitter([x + (640 - x) * 0.35, y + (400 - y) * 0.45], 40)));
+      await touch('touchEnd', []);
+    } else if (roll < 0.55) {
       // All four players hold and drag their corner control at the same time.
       const held = corners.map((c) => jitter(c, 20));
       await touch('touchStart', held);
@@ -78,7 +94,7 @@ for (let round = 1; round <= gameCount; round++) {
       await shot(`11-round${round}-play`);
       took = true;
     }
-    if (Date.now() - start > 120_000) throw new Error(`Round ${round} did not finish`);
+    if (Date.now() - start > 150_000) throw new Error(`Round ${round} did not finish`);
     await page.waitForTimeout(60);
   }
   console.log(`round ${round}: ${((Date.now() - start) / 1000).toFixed(1)} s of play`);

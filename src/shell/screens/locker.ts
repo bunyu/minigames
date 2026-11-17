@@ -1,5 +1,5 @@
 import { itemsFor, SLOT_LABELS, type Item, type Slot } from '../../core/items';
-import { buyAndEquip, equip, lookOf, owns, save, store, type Profile } from '../../core/profiles';
+import { buyAndEquip, equip, lookOf, owns, store, type Profile } from '../../core/profiles';
 import { go } from '../nav';
 import { characterEl, h, screen } from '../ui';
 
@@ -15,7 +15,7 @@ export function lockerScreen(): HTMLElement {
   if (profiles.length === 0) {
     return screen(
       '🎒 Locker',
-      h('p', { class: 'hint' }, 'Create players first (Play → Who is playing?).'),
+      h('p', { class: 'hint' }, 'Play a game first – then come back to spend your stars!'),
       h('div', { class: 'footer' }, h('button', { class: 'btn', onclick: () => go('home') }, '← Home')),
     );
   }
@@ -27,7 +27,7 @@ export function lockerScreen(): HTMLElement {
     'div',
     { class: 'segmented wrap' },
     ...profiles.map((p) =>
-      h('button', { class: `btn${p === profile ? ' on' : ''}`, onclick: () => ((selectedId = p.id), rerender()) }, `${lookOf(p).avatar} ${p.name}`),
+      h('button', { class: `pick${p === profile ? ' on' : ''}`, title: lookOf(p).name, onclick: () => ((selectedId = p.id), rerender()) }, characterEl(lookOf(p), 52)),
     ),
   );
 
@@ -57,15 +57,6 @@ export function lockerScreen(): HTMLElement {
     h('section', {}, h('h2', {}, SLOT_LABELS[slot]), h('div', { class: 'tiles' }, ...itemsFor(slot).map(tile))),
   );
 
-  const rename = () => {
-    const name = window.prompt('New name', profile.name)?.trim();
-    if (name) {
-      profile.name = name.slice(0, 12);
-      save();
-      rerender();
-    }
-  };
-
   return screen(
     '🎒 Locker',
     tabs,
@@ -76,7 +67,7 @@ export function lockerScreen(): HTMLElement {
       h(
         'div',
         { class: 'grow' },
-        h('h2', {}, profile.name, ' ', h('button', { class: 'btn small', onclick: rename }, '✏️')),
+        h('h2', {}, look.name),
         h('div', { class: 'stars' }, `⭐ ${profile.stars}`),
         h('small', {}, `${profile.stats.tournaments} tournaments · ${profile.stats.tournamentWins} won · ${profile.stats.gameWins} game wins`),
       ),

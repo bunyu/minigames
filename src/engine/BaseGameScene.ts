@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
+import { sfx } from '../core/audio';
 import type { Placements } from '../core/scoring';
 import type { GameMeta, GameResult, GameSceneData, SeatPlayer } from '../games/types';
 import { addCharacter, label } from './character';
 import { TouchButton } from './controls';
+import { addGestureDemo, addTips } from './demo';
 import { Joystick } from './joystick';
 import { computeZones, type Zone } from './zones';
 
@@ -128,6 +130,84 @@ export abstract class BaseGameScene extends Phaser.Scene {
     return new Joystick(this, parent, pos.x, pos.y, screen.x, screen.y, this.zones[seat].rotation !== 0, r, this.players[seat].color);
   }
 
+  /** Joystick in the outer corner with an action button stacked just above it (same side column). */
+  protected addJoystickAndButton(
+    seat: number,
+    parent: Phaser.GameObjects.Container,
+    text: string,
+  ): { joy: Joystick; button: TouchButton } {
+    const joy = this.addJoystick(seat, parent);
+    const u = this.unit;
+    const r = u * 0.065;
+    const pos = this.outerCorner(seat, joy.radius);
+    const button = new TouchButton(this, parent, pos.x, pos.y - joy.radius - r - u * 0.05, r, this.players[seat].color, text, 0.32);
+    return { joy, button };
+  }
+
+  /** Remaining-time display at both ends of the screen (one for each side of the table). */
+  protected addTimer(limit: number): () => void {
+    const u = this.unit;
+    const style = (t: Phaser.GameObjects.Text) => t.setDepth(60).setAlpha(0.9);
+    const bottom = style(label(this, this.scale.width / 2, this.scale.height - u * 0.045, '', u * 0.045));
+    const top = style(label(this, this.scale.width / 2, u * 0.045, '', u * 0.045).setRotation(Math.PI));
+    return () => {
+      const left = Math.max(0, Math.ceil(limit - this.elapsed));
+      const text = `⏱ ${left}`;
+      bottom.setText(text).setColor(left <= 5 ? '#ff595e' : '#ffffff');
+      top.setText(text).setColor(left <= 5 ? '#ff595e' : '#ffffff');
+    };
+  }
+
+  /** Convert a screen point into a seat's zone-local coordinates (+y toward that player). */
+  protected toZoneLocal(seat: number, x: number, y: number): { x: number; y: number } {
+    const z = this.zones[seat];
+    const s = z.rotation === 0 ? 1 : -1;
+    return { x: (x - z.cx) * s, y: (y - z.cy) * s };
+  }
+
+  /** Which player's zone contains a screen point (-1 if none). */
+  protected seatAt(x: number, y: number): number {
+    return this.zones.findIndex((z) => x >= z.x && x < z.x + z.w && y >= z.y && y < z.y + z.h);
+  }
+
+  /**
+   * Track touches per seat: a touch belongs to the zone where it started.
+   * Handlers receive screen coordinates. Listeners are removed on shutdown.
+   */
+  protected trackTouches(handlers: {
+    down?: (seat: number, p: Phaser.Input.Pointer) => boolean | void;
+    move?: (seat: number, p: Phaser.Input.Pointer) => void;
+    up?: (seat: number, p: Phaser.Input.Pointer) => void;
+  }): void {
+    const owner = new Map<number, number>();
+    const onDown = (p: Phaser.Input.Pointer) => {
+      const seat = this.seatAt(p.x, p.y);
+      if (seat < 0) return;
+      if (handlers.down?.(seat, p) === false) return;
+      owner.set(p.id, seat);
+    };
+    const onMove = (p: Phaser.Input.Pointer) => {
+      const seat = owner.get(p.id);
+      if (seat !== undefined && p.isDown) handlers.move?.(seat, p);
+    };
+    const onUp = (p: Phaser.Input.Pointer) => {
+      const seat = owner.get(p.id);
+      if (seat === undefined) return;
+      owner.delete(p.id);
+      handlers.up?.(seat, p);
+    };
+    this.input.on('pointerdown', onDown);
+    this.input.on('pointermove', onMove);
+    this.input.on('pointerup', onUp);
+    this.input.on('pointerupoutside', onUp);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.input.off('pointerdown', onDown);
+      this.input.off('pointermove', onMove);
+      this.input.off('pointerup', onUp);
+      this.input.off('pointerupoutside', onUp);
+    });
+  }
+
   /** Show a short message in each player's zone (rotated toward them). */
   protected toast(text: string, seats: number[] = this.players.map((p) => p.seat), ms = 1200): void {
     for (const seat of seats) {
@@ -142,6 +222,7 @@ export abstract class BaseGameScene extends Phaser.Scene {
     if (this.finished) return;
     this.finished = true;
     this.playing = false;
+    sfx('win');
     this.zones.forEach((z, i) => {
       const c = this.zoneContainer(i).setDepth(300);
       const place = placements[i];
@@ -161,23 +242,30 @@ export abstract class BaseGameScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const dim = this.add.rectangle(0, 0, width, height, 0x000000, 0.6).setOrigin(0).setDepth(200).setInteractive();
     const ready = new Set<number>();
+    const cleanups: (() => void)[] = [];
     const panels = this.zones.map((z, i) => {
       const p = this.players[i];
       const u = Math.min(z.w, z.h);
       const c = this.zoneContainer(i).setDepth(201);
-      const title = label(this, 0, -z.h * 0.3, `${this.meta.icon} ${this.meta.title}`, u * 0.11);
-      const how = label(this, 0, -z.h * 0.08, this.meta.howToPlay, u * 0.06).setWordWrapWidth(z.w * 0.85);
-      const btnY = z.h * 0.28;
-      const btn = new TouchButton(this, c, 0, btnY, u * 0.13, p.color, 'READY');
-      const who = addCharacter(this, -u * 0.13 - u * 0.16, btnY, p, u * 0.16);
+      const title = label(this, 0, -z.h * 0.37, `${this.meta.icon} ${this.meta.title}`, u * 0.1);
+      // Animated "how to play": the gesture on the left, picture tips on the right.
+      const demoY = -z.h * 0.13;
+      cleanups.push(addGestureDemo(this, c, -z.w * 0.2, demoY, u * 0.5, this.meta.gesture, p.color));
+      cleanups.push(addTips(this, c, z.w * 0.17, demoY, this.meta.tips, u * 0.065, z.w * 0.38));
+      const how = label(this, 0, z.h * 0.145, this.meta.howToPlay, u * 0.037).setWordWrapWidth(z.w * 0.9).setAlpha(0.85);
+      const btnY = z.h * 0.31;
+      const btn = new TouchButton(this, c, 0, btnY, u * 0.11, p.color, 'READY');
+      const who = addCharacter(this, -u * 0.11 - u * 0.14, btnY, p, u * 0.14);
       c.add([title, how, who]);
       btn.onPress = () => {
         if (ready.has(i)) return;
         ready.add(i);
+        sfx('tap');
         btn.setText('✓').setEnabled(false);
         if (ready.size === this.players.length) {
           this.time.delayedCall(250, () => {
             dim.destroy();
+            cleanups.forEach((fn) => fn());
             panels.forEach((pc) => pc.destroy());
             this.countdown();
           });
@@ -197,6 +285,7 @@ export abstract class BaseGameScene extends Phaser.Scene {
     let n = 3;
     const step = () => {
       const text = n > 0 ? String(n) : 'GO!';
+      sfx(n > 0 ? 'beep' : 'go');
       labels.forEach(({ t }) => {
         t.setText(text);
         this.tweens.add({ targets: t, scale: { from: 1.6, to: 1 }, alpha: { from: 1, to: 0.7 }, duration: 500 });

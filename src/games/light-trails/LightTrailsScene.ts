@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { sfx } from '../../core/audio';
 import { placementsFromScores } from '../../core/scoring';
 import { BaseGameScene } from '../../engine/BaseGameScene';
 import { addCharacter } from '../../engine/character';
@@ -14,6 +15,8 @@ export const lightTrailsMeta: GameMeta = {
   maxPlayers: 4,
   approxSeconds: 45,
   howToPlay: 'Steer with ◀ and ▶. Do not hit the walls or any light trail. Last rider wins!',
+  gesture: 'lr',
+  tips: ['◀ ▶ = turn', '🚫 Never touch a trail', '🏆 Last rider wins'],
   background: '#10002b',
 };
 
@@ -145,6 +148,7 @@ export class LightTrailsScene extends BaseGameScene {
 
   private crash(b: Bike): void {
     b.alive = false;
+    sfx('boom');
     b.diedAtStep = this.stepCount;
     b.left.setEnabled(false);
     b.right.setEnabled(false);

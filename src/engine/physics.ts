@@ -131,3 +131,12 @@ export function sweptAcross(from: number, to: number, target: number): boolean {
   if (d0 === 0 || d1 === 0) return true;
   return Math.sign(d0) !== Math.sign(d1) && Math.abs(d0) < Math.PI / 2 && Math.abs(d1) < Math.PI / 2;
 }
+
+/** Distance from point P to segment AB. */
+export function segmentDistance(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const len2 = dx * dx + dy * dy;
+  const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / len2));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}

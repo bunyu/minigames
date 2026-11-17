@@ -1,7 +1,21 @@
+import { BalloonJoustScene, balloonJoustMeta } from './balloon-joust/BalloonJoustScene';
 import { BombTagScene, bombTagMeta } from './bomb-tag/BombTagScene';
+import { ChairDashScene, chairDashMeta } from './chair-dash/ChairDashScene';
+import { FruitSlashScene, fruitSlashMeta } from './fruit-slash/FruitSlashScene';
+import { GemMinerScene, gemMinerMeta } from './gem-miner/GemMinerScene';
+import { HoopShotScene, hoopShotMeta } from './hoop-shot/HoopShotScene';
+import { LavaFloorScene, lavaFloorMeta } from './lava-floor/LavaFloorScene';
+import { SpikeClimbScene, spikeClimbMeta } from './spike-climb/SpikeClimbScene';
+import { BumperSoccerScene, bumperSoccerMeta } from './bumper-soccer/BumperSoccerScene';
+import { CoinGrabScene, coinGrabMeta } from './coin-grab/CoinGrabScene';
+import { KartRallyScene, kartRallyMeta } from './kart-rally/KartRallyScene';
+import { KingOfTheHillScene, kingOfTheHillMeta } from './king-of-the-hill/KingOfTheHillScene';
 import { LaserJumpScene, laserJumpMeta } from './laser-jump/LaserJumpScene';
 import { LightTrailsScene, lightTrailsMeta } from './light-trails/LightTrailsScene';
 import { MeteorDodgeScene, meteorDodgeMeta } from './meteor-dodge/MeteorDodgeScene';
+import { PingSquareScene, pingSquareMeta } from './ping-square/PingSquareScene';
+import { ShowdownScene, showdownMeta } from './showdown/ShowdownScene';
+import { SnowballFightScene, snowballFightMeta } from './snowball-fight/SnowballFightScene';
 import { SumoBumpScene, sumoBumpMeta } from './sumo-bump/SumoBumpScene';
 import { TankTwirlScene, tankTwirlMeta } from './tank-twirl/TankTwirlScene';
 import type { GameEntry, GameMeta } from './types';
@@ -14,6 +28,20 @@ export const GAMES: readonly GameEntry[] = [
   { meta: meteorDodgeMeta, scene: MeteorDodgeScene },
   { meta: laserJumpMeta, scene: LaserJumpScene },
   { meta: bombTagMeta, scene: BombTagScene },
+  { meta: bumperSoccerMeta, scene: BumperSoccerScene },
+  { meta: pingSquareMeta, scene: PingSquareScene },
+  { meta: snowballFightMeta, scene: SnowballFightScene },
+  { meta: coinGrabMeta, scene: CoinGrabScene },
+  { meta: kartRallyMeta, scene: KartRallyScene },
+  { meta: kingOfTheHillMeta, scene: KingOfTheHillScene },
+  { meta: showdownMeta, scene: ShowdownScene },
+  { meta: lavaFloorMeta, scene: LavaFloorScene },
+  { meta: fruitSlashMeta, scene: FruitSlashScene },
+  { meta: balloonJoustMeta, scene: BalloonJoustScene },
+  { meta: gemMinerMeta, scene: GemMinerScene },
+  { meta: spikeClimbMeta, scene: SpikeClimbScene },
+  { meta: hoopShotMeta, scene: HoopShotScene },
+  { meta: chairDashMeta, scene: ChairDashScene },
 ];
 
 export function gameMeta(id: string): GameMeta {

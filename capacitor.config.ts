@@ -4,7 +4,7 @@ const config: CapacitorConfig = {
   appId: 'io.github.bunyu.minigames',
   appName: 'Party Minigames',
   webDir: 'dist',
-  backgroundColor: '#1d2b53',
+  backgroundColor: '#6ec6ff',
   android: {
     allowMixedContent: false,
   },
