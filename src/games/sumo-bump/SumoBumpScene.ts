@@ -58,7 +58,7 @@ export class SumoBumpScene extends BaseGameScene {
     this.r0 = this.radius = u * 0.43;
     this.sumoR = u * 0.05;
     this.arena = this.add.graphics();
-    this.drawArena();
+    this.drawRing();
 
     this.sumos = this.players.map((p, i) => {
       // Start between the centre and the player's own zone, facing the centre.
@@ -100,7 +100,7 @@ export class SumoBumpScene extends BaseGameScene {
 
   protected startGame(): void {}
 
-  private drawArena(): void {
+  private drawRing(): void {
     const g = this.arena.clear();
     g.fillStyle(0x13315c, 1).fillCircle(this.cx, this.cy, this.r0 * 1.02);
     g.fillStyle(0xd7ecff, 1).fillCircle(this.cx, this.cy, this.radius);
@@ -123,7 +123,7 @@ export class SumoBumpScene extends BaseGameScene {
     const t = this.elapsed;
     if (t > SHRINK_START) {
       this.radius = this.r0 * Math.max(0.4, 1 - (t - SHRINK_START) * 0.012);
-      this.drawArena();
+      this.drawRing();
     }
     const spin = 3 + Math.min(2, t * 0.03);
     const friction = Math.exp(-2 * dt);

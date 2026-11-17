@@ -214,9 +214,9 @@ The shell never knows game internals: it starts the scene with `{ players, setti
 
 | Milestone | Content | Done when |
 |---|---|---|
-| **M0 – Scaffold** | Vite + TS + Phaser, ESLint/Prettier, Vitest, GitHub Actions, GitHub Pages deploy, PWA manifest + icons | Blank app installs to iPad home screen and runs offline |
-| **M1 – Core loop** | Player setup, tournament setup (3–10 games), BaseGameScene, ZoneLayout, scoring + tie-breaks (unit-tested), round results, final podium, profiles + stars + Locker; 2 games (**Sumo Bump**, **Light Trails**) + shared joystick / button controls | A full tournament of 3 games can be played end-to-end with 2, 3 and 4 players |
-| **M2 – First 6 games** | Tank Twirl, Meteor Dodge, Laser Jump, Bomb Tag | Family playtest #1 |
+| **M0 – Scaffold** ✅ | Vite + TS + Phaser, Vitest (ESLint/Prettier still to add), GitHub Actions, GitHub Pages deploy, PWA manifest + icons | Blank app installs to iPad home screen and runs offline |
+| **M1 – Core loop** ✅ | Player setup, tournament setup (3–10 games), BaseGameScene, ZoneLayout, scoring + tie-breaks (unit-tested), round results, final podium, profiles + stars + Locker; 2 games (**Sumo Bump**, **Light Trails**) + shared joystick / button controls | A full tournament of 3 games can be played end-to-end with 2, 3 and 4 players |
+| **M2 – First 6 games** ✅ | Tank Twirl, Meteor Dodge, Laser Jump, Bomb Tag + virtual joystick, shared arena/physics helpers | Family playtest #1 |
 | **M3 – Android** | (JDK 21 installed ✅) Capacitor Android project, icons/splash, landscape lock, keep-awake, signed release APK | APK installs and plays on an Android phone/tablet |
 | **M4 – Games 7–13** | Bumper Soccer, Ping Square, Snowball Fight, Coin Grab, Kart Rally, King of the Hill, Showdown | Family playtest #2 (13 games) |
 | **M5 – Polish** | Sound effects + music, animated "how to play" demos, handicap system, settings screen, confetti/podium animations, balanced "Random" picker | Kids can run a tournament without adult help |

@@ -3,6 +3,7 @@ import type { Placements } from '../core/scoring';
 import type { GameMeta, GameResult, GameSceneData, SeatPlayer } from '../games/types';
 import { addCharacter, label } from './character';
 import { TouchButton } from './controls';
+import { Joystick } from './joystick';
 import { computeZones, type Zone } from './zones';
 
 /**
@@ -79,6 +80,52 @@ export abstract class BaseGameScene extends Phaser.Scene {
     const screenDir = z.cx < mid - 1 ? -1 : z.cx > mid + 1 ? 1 : 0;
     const lx = screenDir === 0 ? 1 : screenDir * (z.rotation === 0 ? 1 : -1);
     return { x: lx * (z.w / 2 - r - margin), y: z.h / 2 - r - margin };
+  }
+
+  /**
+   * Playing field for arena games: the screen minus two side columns where the
+   * corner controls live, so nobody's hand covers the action.
+   */
+  protected arenaRect(): Phaser.Geom.Rectangle {
+    const u = this.unit;
+    const side = u * 0.25;
+    const pad = u * 0.03;
+    return new Phaser.Geom.Rectangle(side, pad, this.scale.width - side * 2, this.scale.height - pad * 2);
+  }
+
+  /** Arena floor plus opaque side panels drawn above flying objects (depth 40). */
+  protected drawArena(floor: number, edge: number): Phaser.Geom.Rectangle {
+    const a = this.arenaRect();
+    const { width, height } = this.scale;
+    const bg = this.cameras.main.backgroundColor.color;
+    this.add.rectangle(a.x, a.y, a.width, a.height, floor).setOrigin(0).setDepth(0);
+    const g = this.add.graphics().setDepth(40);
+    g.fillStyle(bg, 1);
+    g.fillRect(0, 0, a.x, height);
+    g.fillRect(a.right, 0, width - a.right, height);
+    g.fillRect(0, 0, width, a.y);
+    g.fillRect(0, a.bottom, width, height - a.bottom);
+    g.lineStyle(this.unit * 0.01, edge, 1).strokeRect(a.x, a.y, a.width, a.height);
+    return a;
+  }
+
+  /** Start position for a seat inside the arena, toward that player's corner. */
+  protected seatStart(seat: number, frac = 0.6): { x: number; y: number; facing: number } {
+    const a = this.arenaRect();
+    const z = this.zones[seat];
+    const sx = Math.sign(Math.round(z.cx - a.centerX));
+    const sy = Math.sign(Math.round(z.cy - a.centerY));
+    const x = a.centerX + sx * (a.width / 2) * frac;
+    const y = a.centerY + sy * (a.height / 2) * frac;
+    return { x, y, facing: Math.atan2(a.centerY - y, a.centerX - x) };
+  }
+
+  /** A joystick in the seat's outer corner. */
+  protected addJoystick(seat: number, parent: Phaser.GameObjects.Container): Joystick {
+    const r = this.unit * 0.09;
+    const pos = this.outerCorner(seat, r);
+    const screen = this.zonePoint(seat, pos.x, pos.y);
+    return new Joystick(this, parent, pos.x, pos.y, screen.x, screen.y, this.zones[seat].rotation !== 0, r, this.players[seat].color);
   }
 
   /** Show a short message in each player's zone (rotated toward them). */
